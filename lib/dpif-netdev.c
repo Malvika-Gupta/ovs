@@ -7337,7 +7337,7 @@ fast_path_processing(struct dp_netdev_pmd_thread *pmd,
                             upcall_fail_cnt);
 }
 
-/* Packets enter the datapath from a port (or from recirculation) here.
+/* Packets from a port (or from recirculation) enter the datapath here.
  *
  * When 'md_is_valid' is true the metadata in 'packets' are already valid.
  * When false the metadata in 'packets' need to be initialized. */
