@@ -84,10 +84,10 @@
 
 VLOG_DEFINE_THIS_MODULE(dpif_netdev);
 
-/* Auto Load Balancing Defaults */
+/* Auto Load Balancing Defaults. */
 #define ALB_ACCEPTABLE_IMPROVEMENT       25
 #define ALB_PMD_LOAD_THRESHOLD           95
-#define ALB_PMD_REBALANCE_POLL_INTERVAL  1 /* 1 Min */
+#define ALB_PMD_REBALANCE_POLL_INTERVAL  1 /* 1 Min. */
 #define MIN_TO_MSEC                  60000
 
 #define FLOW_DUMP_MAX_BATCH 50
@@ -142,9 +142,9 @@ static struct odp_support dp_netdev_support = {
     .ct_orig_tuple6 = true,
 };
 
-/* EMC cache and SMC cache compose the datapath flow cache (DFC)
+/* EMC cache and SMC cache compose the datapath flow cache (DFC).
  *
- * Exact match cache for frequently used flows
+ * Exact match cache for frequently used flows.
  *
  * The cache uses a 32-bit hash of the packet (which can be the RSS hash) to
  * search its entries for a miniflow that matches exactly the miniflow of the
@@ -158,7 +158,7 @@ static struct odp_support dp_netdev_support = {
  * value is the index of a cache entry where the miniflow could be.
  *
  *
- * Signature match cache (SMC)
+ * Signature match cache (SMC).
  *
  * This cache stores a 16-bit signature for each flow without storing keys, and
  * stores the corresponding 16-bit flow_table index to the 'dp_netdev_flow'.
@@ -189,7 +189,7 @@ static struct odp_support dp_netdev_support = {
 #define SMC_BUCKET_CNT (SMC_ENTRIES / SMC_ENTRY_PER_BUCKET)
 #define SMC_MASK (SMC_BUCKET_CNT - 1)
 
-/* Default EMC insert probability is 1 / DEFAULT_EM_FLOW_INSERT_INV_PROB */
+/* Default EMC insert probability is 1 / DEFAULT_EM_FLOW_INSERT_INV_PROB. */
 #define DEFAULT_EM_FLOW_INSERT_INV_PROB 100
 #define DEFAULT_EM_FLOW_INSERT_MIN (UINT32_MAX /                     \
                                     DEFAULT_EM_FLOW_INSERT_INV_PROB)
@@ -209,7 +209,7 @@ struct smc_bucket {
     uint16_t flow_idx[SMC_ENTRY_PER_BUCKET];
 };
 
-/* Signature match cache, differentiate from EMC cache */
+/* Signature match cache, differentiate from EMC cache. */
 struct smc_cache {
     struct smc_bucket buckets[SMC_BUCKET_CNT];
 };
@@ -230,7 +230,7 @@ struct dfc_cache {
 /* Simple non-wildcarding single-priority classifier. */
 
 /* Time in microseconds between successive optimizations of the dpcls
- * subtable vector */
+ * subtable vector. */
 #define DPCLS_OPTIMIZATION_INTERVAL 1000000LL
 
 /* Time in microseconds of the interval in which rxq processing cycles used
@@ -245,7 +245,7 @@ struct dfc_cache {
 #define PMD_RCU_QUIESCE_INTERVAL 10000LL
 
 struct dpcls {
-    struct cmap_node node;      /* Within dp_netdev_pmd_thread.classifiers */
+    struct cmap_node node;      /* Within dp_netdev_pmd_thread.classifiers. */
     odp_port_t in_port;
     struct cmap subtables_map;
     struct pvector subtables;
@@ -270,17 +270,17 @@ static bool dpcls_lookup(struct dpcls *cls,
                          struct dpcls_rule **rules, size_t cnt,
                          int *num_lookups_p);
 
-/* Set of supported meter flags */
+/* Set of supported meter flags. */
 #define DP_SUPPORTED_METER_FLAGS_MASK \
     (OFPMF13_STATS | OFPMF13_PKTPS | OFPMF13_KBPS | OFPMF13_BURST)
 
-/* Set of supported meter band types */
+/* Set of supported meter band types. */
 #define DP_SUPPORTED_METER_BAND_TYPES           \
     ( 1 << OFPMBT13_DROP )
 
 struct dp_meter_band {
-    struct ofputil_meter_band up; /* type, prec_level, pad, rate, burst_size */
-    uint32_t bucket; /* In 1/1000 packets (for PKTPS), or in bits (for KBPS) */
+    struct ofputil_meter_band up; /* type, prec_level, pad, rate, burst_size. */
+    uint32_t bucket; /* In 1/1000 packets (for PKTPS), or in bits (for KBPS). */
     uint64_t packet_count;
     uint64_t byte_count;
 };
@@ -343,7 +343,7 @@ struct dp_netdev {
     OVS_ALIGNED_VAR(CACHE_LINE_SIZE) atomic_uint32_t emc_insert_min;
     /* Enable collection of PMD performance metrics. */
     atomic_bool pmd_perf_metrics;
-    /* Enable the SMC cache from ovsdb config */
+    /* Enable the SMC cache from ovsdb config. */
     atomic_bool smc_enable_db;
 
     /* Protects access to ofproto-dpif-upcall interface during revalidator
@@ -476,7 +476,7 @@ struct dp_netdev_port {
     struct hmap_node node;      /* Node in dp_netdev's 'ports'. */
     struct netdev_saved_flags *sf;
     struct dp_netdev_rxq *rxqs;
-    unsigned n_rxq;             /* Number of elements in 'rxqs' */
+    unsigned n_rxq;             /* Number of elements in 'rxqs'. */
     unsigned *txq_used;         /* Number of threads that use each tx queue. */
     struct ovs_mutex txq_used_mutex;
     bool emc_enabled;           /* If true EMC will be used. */
@@ -540,7 +540,7 @@ struct dp_netdev_flow {
     /* Hash table index by unmasked flow. */
     const struct cmap_node node; /* In owning dp_netdev_pmd_thread's */
                                  /* 'flow_table'. */
-    const struct cmap_node mark_node; /* In owning flow_mark's mark_to_flow */
+    const struct cmap_node mark_node; /* In owning flow_mark's mark_to_flow. */
     const ovs_u128 ufid;         /* Unique flow identifier. */
     const ovs_u128 mega_ufid;    /* Unique mega flow identifier. */
     const unsigned pmd_id;       /* The 'core_id' of pmd thread owning this */
@@ -553,7 +553,7 @@ struct dp_netdev_flow {
     struct ovs_refcount ref_cnt;
 
     bool dead;
-    uint32_t mark;               /* Unique flow mark assigned to a flow */
+    uint32_t mark;               /* Unique flow mark assigned to a flow. */
 
     /* Statistics. */
     struct dp_netdev_flow_stats stats;
@@ -685,7 +685,7 @@ struct dp_netdev_pmd_thread {
      * will only be accessed by its own pmd thread. */
     OVS_ALIGNED_VAR(CACHE_LINE_SIZE) struct dfc_cache flow_cache;
 
-    /* Flow-Table and classifiers
+    /* Flow-Table and classifiers.
      *
      * Writers of 'flow_table' must take the 'flow_mutex'.  Corresponding
      * changes to 'classifiers' must be made while still holding the
@@ -694,9 +694,9 @@ struct dp_netdev_pmd_thread {
     struct ovs_mutex flow_mutex;
     struct cmap flow_table OVS_GUARDED; /* Flow table. */
 
-    /* One classifier per in_port polled by the pmd */
+    /* One classifier per in_port polled by the pmd. */
     struct cmap classifiers;
-    /* Periodically sort subtable vectors according to hit frequencies */
+    /* Periodically sort subtable vectors according to hit frequencies. */
     long long int next_optimization;
     /* End of the next time interval for which processing cycles
        are stored for each polled rxq. */
@@ -1388,7 +1388,7 @@ dpif_netdev_subtable_lookup_set(struct unixctl_conn *conn, int argc,
     struct dp_netdev_pmd_thread **pmd_list;
     sorted_poll_thread_list(dp, &pmd_list, &n);
 
-    /* take port mutex as HMAP iters over them. */
+    /* Take port mutex as HMAP iters over them. */
     ovs_mutex_lock(&dp->port_mutex);
 
     for (size_t i = 0; i < n; i++) {
@@ -1412,7 +1412,7 @@ dpif_netdev_subtable_lookup_set(struct unixctl_conn *conn, int argc,
         }
     }
 
-    /* release port mutex before netdev mutex. */
+    /* Release port mutex before netdev mutex. */
     ovs_mutex_unlock(&dp->port_mutex);
     ovs_mutex_unlock(&dp_netdev_mutex);
 
@@ -1438,7 +1438,7 @@ dpif_netdev_pmd_rebalance(struct unixctl_conn *conn, int argc,
     if (argc == 2) {
         dp = shash_find_data(&dp_netdevs, argv[1]);
     } else if (shash_count(&dp_netdevs) == 1) {
-        /* There's only one datapath */
+        /* There's only one datapath. */
         dp = shash_first(&dp_netdevs)->data;
     }
 
@@ -1486,7 +1486,7 @@ dpif_netdev_pmd_info(struct unixctl_conn *conn, int argc, const char *argv[],
 
     if (!dp) {
         if (shash_count(&dp_netdevs) == 1) {
-            /* There's only one datapath */
+            /* There's only one datapath. */
             dp = shash_first(&dp_netdevs)->data;
         } else {
             ovs_mutex_unlock(&dp_netdev_mutex);
@@ -1805,7 +1805,7 @@ create_dp_netdev(const char *name, const struct dpif_class *class,
     ovsthread_key_create(&dp->per_pmd_key, NULL);
 
     ovs_mutex_lock(&dp->port_mutex);
-    /* non-PMD will be created before all other threads and will
+    /* Non-PMD will be created before all other threads and will
      * allocate static_tx_qid = 0. */
     dp_netdev_set_nonpmd(dp);
 
@@ -1863,10 +1863,10 @@ static void
 dp_netdev_destroy_upcall_lock(struct dp_netdev *dp)
     OVS_NO_THREAD_SAFETY_ANALYSIS
 {
-    /* Check that upcalls are disabled, i.e. that the rwlock is taken */
+    /* Check that upcalls are disabled, i.e. that the rwlock is taken. */
     ovs_assert(fat_rwlock_tryrdlock(&dp->upcall_rwlock));
 
-    /* Before freeing a lock we should release it */
+    /* Before freeing a lock we should release it. */
     fat_rwlock_unlock(&dp->upcall_rwlock);
     fat_rwlock_destroy(&dp->upcall_rwlock);
 }
@@ -1932,7 +1932,7 @@ dp_netdev_free(struct dp_netdev *dp)
     cmap_destroy(&dp->tx_bonds);
     ovs_mutex_destroy(&dp->bond_mutex);
 
-    /* Upcalls must be disabled at this point */
+    /* Upcalls must be disabled at this point. */
     dp_netdev_destroy_upcall_lock(dp);
 
     int i;
@@ -2065,7 +2065,7 @@ port_create(const char *devname, const char *type,
     if (error) {
         return error;
     }
-    /* XXX reject non-Ethernet devices */
+    /* XXX reject non-Ethernet devices. */
 
     netdev_get_flags(netdev, &flags);
     if (flags & NETDEV_LOOPBACK) {
@@ -2363,7 +2363,7 @@ dp_netdev_pmd_lookup_dpcls(struct dp_netdev_pmd_thread *pmd,
     uint32_t hash = hash_port_no(in_port);
     CMAP_FOR_EACH_WITH_HASH (cls, node, hash, &pmd->classifiers) {
         if (cls->in_port == in_port) {
-            /* Port classifier exists already */
+            /* Port classifier exists already. */
             return cls;
         }
     }
@@ -2379,7 +2379,7 @@ dp_netdev_pmd_find_dpcls(struct dp_netdev_pmd_thread *pmd,
     uint32_t hash = hash_port_no(in_port);
 
     if (!cls) {
-        /* Create new classifier for in_port */
+        /* Create new classifier for in_port. */
         cls = xmalloc(sizeof(*cls));
         dpcls_init(cls);
         cls->in_port = in_port;
@@ -2419,7 +2419,7 @@ flow_mark_alloc(void)
     uint32_t mark;
 
     if (!flow_mark.pool) {
-        /* Haven't initiated yet, do it here */
+        /* Haven't initiated yet, do it here. */
         flow_mark.pool = id_pool_create(1, MAX_FLOW_MARK);
     }
 
@@ -2436,7 +2436,7 @@ flow_mark_free(uint32_t mark)
     id_pool_free_id(flow_mark.pool, mark);
 }
 
-/* associate megaflow with a mark, which is a 1:1 mapping */
+/* Associate megaflow with a mark, which is a 1:1 mapping. */
 static void
 megaflow_to_mark_associate(const ovs_u128 *mega_ufid, uint32_t mark)
 {
@@ -2450,7 +2450,7 @@ megaflow_to_mark_associate(const ovs_u128 *mega_ufid, uint32_t mark)
                 CONST_CAST(struct cmap_node *, &data->node), hash);
 }
 
-/* disassociate meagaflow with a mark */
+/* Disassociate megaflow with a mark. */
 static void
 megaflow_to_mark_disassociate(const ovs_u128 *mega_ufid)
 {
@@ -2487,7 +2487,7 @@ megaflow_to_mark_find(const ovs_u128 *mega_ufid)
     return INVALID_FLOW_MARK;
 }
 
-/* associate mark with a flow, which is 1:N mapping */
+/* Associate mark with a flow, which is 1:N mapping. */
 static void
 mark_to_flow_associate(const uint32_t mark, struct dp_netdev_flow *flow)
 {
@@ -2536,8 +2536,7 @@ mark_to_flow_disassociate(struct dp_netdev_pmd_thread *pmd,
     cmap_remove(&flow_mark.mark_to_flow, mark_node, hash_int(mark, 0));
     flow->mark = INVALID_FLOW_MARK;
 
-    /*
-     * no flow is referencing the mark any more? If so, let's
+    /* No flow is referencing the mark any more? If so, let's
      * remove the flow from hardware and free the mark.
      */
     if (flow_mark_has_no_ref(mark)) {
@@ -2637,8 +2636,7 @@ dp_netdev_flow_offload_del(struct dp_flow_offload_item *offload)
     return mark_to_flow_disassociate(offload->pmd, offload->flow);
 }
 
-/*
- * There are two flow offload operations here: addition and modification.
+/* There are two flow offload operations here: addition and modification.
  *
  * For flow addition, this function does:
  * - allocate a new flow mark id
@@ -2669,8 +2667,7 @@ dp_netdev_flow_offload_put(struct dp_flow_offload_item *offload)
         mark = flow->mark;
         ovs_assert(mark != INVALID_FLOW_MARK);
     } else {
-        /*
-         * If a mega flow has already been offloaded (from other PMD
+        /* If a mega flow has already been offloaded (from other PMD
          * instances), do not offload it again.
          */
         mark = megaflow_to_mark_find(&flow->mega_ufid);
@@ -2972,7 +2969,7 @@ static bool dp_netdev_flow_ref(struct dp_netdev_flow *flow)
  * - These functions can be inlined by the compiler. */
 
 /* Given the number of bits set in miniflow's maps, returns the size of the
- * 'netdev_flow_key.mf' */
+ * 'netdev_flow_key.mf'. */
 static inline size_t
 netdev_flow_key_size(size_t flow_u64s)
 {
@@ -3107,13 +3104,13 @@ emc_insert(struct emc_cache *cache, const struct netdev_flow_key *key,
 
     EMC_FOR_EACH_POS_WITH_HASH(cache, current_entry, key->hash) {
         if (netdev_flow_key_equal(&current_entry->key, key)) {
-            /* We found the entry with the 'mf' miniflow */
+            /* We found the entry with the 'mf' miniflow. */
             emc_change_entry(current_entry, flow, NULL);
             return;
         }
 
         /* Replacement policy: put the flow in an empty (not alive) entry, or
-         * in the first entry where it can be */
+         * in the first entry where it can be. */
         if (!to_be_replaced
             || (emc_entry_alive(to_be_replaced)
                 && !emc_entry_alive(current_entry))
@@ -3122,7 +3119,7 @@ emc_insert(struct emc_cache *cache, const struct netdev_flow_key *key,
         }
     }
     /* We didn't find the miniflow in the cache.
-     * The 'to_be_replaced' entry is where the new flow will be stored */
+     * The 'to_be_replaced' entry is where the new flow will be stored. */
 
     emc_change_entry(to_be_replaced, flow, key);
 }
@@ -3134,7 +3131,7 @@ emc_probabilistic_insert(struct dp_netdev_pmd_thread *pmd,
 {
     /* Insert an entry into the EMC based on probability value 'min'. By
      * default the value is UINT32_MAX / 100 which yields an insertion
-     * probability of 1/100 ie. 1% */
+     * probability of 1/100 ie. 1%. */
 
     uint32_t min = pmd->ctx.emc_insert_min;
 
@@ -3153,7 +3150,7 @@ emc_lookup(struct emc_cache *cache, const struct netdev_flow_key *key)
             && emc_entry_alive(current_entry)
             && netdev_flow_key_equal_mf(&current_entry->key, &key->mf)) {
 
-            /* We found the entry with the 'key->mf' miniflow */
+            /* We found the entry with the 'key->mf' miniflow. */
             return current_entry->flow;
         }
     }
@@ -3214,12 +3211,12 @@ smc_insert(struct dp_netdev_pmd_thread *pmd,
     index = (cmap_index >= UINT16_MAX) ? UINT16_MAX : (uint16_t)cmap_index;
 
     /* If the index is larger than SMC can handle (uint16_t), we don't
-     * insert */
+     * insert. */
     if (index == UINT16_MAX) {
         return;
     }
 
-    /* If an entry with same signature already exists, update the index */
+    /* If an entry with same signature already exists, update the index. */
     uint16_t sig = key->hash >> 16;
     for (i = 0; i < SMC_ENTRY_PER_BUCKET; i++) {
         if (bucket->sig[i] == sig) {
@@ -3460,20 +3457,20 @@ dp_netdev_flow_to_dpif_flow(const struct dp_netdev *dp,
          * optimnization reasons. Add in_port back to the mask. */
         wc.masks.in_port.odp_port = ODPP_NONE;
 
-        /* Key */
+        /* Key. */
         offset = key_buf->size;
         flow->key = ofpbuf_tail(key_buf);
         odp_flow_key_from_flow(&odp_parms, key_buf);
         flow->key_len = key_buf->size - offset;
 
-        /* Mask */
+        /* Mask. */
         offset = mask_buf->size;
         flow->mask = ofpbuf_tail(mask_buf);
         odp_parms.key_buf = key_buf;
         odp_flow_key_from_mask(&odp_parms, mask_buf);
         flow->mask_len = mask_buf->size - offset;
 
-        /* Actions */
+        /* Actions. */
         actions = dp_netdev_flow_get_actions(netdev_flow);
         flow->actions = actions->actions;
         flow->actions_len = actions->size;
@@ -3788,7 +3785,7 @@ flow_put_on_pmd(struct dp_netdev_pmd_thread *pmd,
                  *   option --clear.
                  * - Should the need arise, this operation can be implemented
                  *   by keeping a base value (to be update here) for each
-                 *   counter, and subtracting it before outputting the stats */
+                 *   counter, and subtracting it before outputting the stats. */
                 error = EOPNOTSUPP;
             }
 
@@ -4808,14 +4805,14 @@ port_reconfigure(struct dp_netdev_port *port)
     /* Parse affinity list to apply configuration for new queues. */
     dpif_netdev_port_set_rxq_affinity(port, port->rxq_affinity_list);
 
-    /* If reconfiguration was successful mark it as such, so we can use it */
+    /* If reconfiguration was successful mark it as such, so we can use it. */
     port->need_reconfigure = false;
 
     return 0;
 }
 
 struct rr_numa_list {
-    struct hmap numas;  /* Contains 'struct rr_numa' */
+    struct hmap numas;  /* Contains 'struct rr_numa'. */
 };
 
 struct rr_numa {
@@ -4823,7 +4820,7 @@ struct rr_numa {
 
     int numa_id;
 
-    /* Non isolated pmds on numa node 'numa_id' */
+    /* Non isolated pmds on numa node 'numa_id'. */
     struct dp_netdev_pmd_thread **pmds;
     int n_pmds;
 
@@ -4942,7 +4939,7 @@ rr_numa_list_destroy(struct rr_numa_list *rr)
     hmap_destroy(&rr->numas);
 }
 
-/* Sort Rx Queues by the processing cycles they are consuming. */
+/* Sort Rx queues by the processing cycles they are consuming. */
 static int
 compare_rxq_cycles(const void *a, const void *b)
 {
@@ -5154,7 +5151,7 @@ reconfigure_pmd_threads(struct dp_netdev *dp)
         need_to_adjust_static_tx_qids = true;
     }
 
-    /* Check for unwanted pmd threads */
+    /* Check for unwanted pmd threads. */
     CMAP_FOR_EACH (pmd, node, &dp->poll_threads) {
         if (pmd->core_id == NON_PMD_CORE_ID) {
             continue;
@@ -5183,7 +5180,7 @@ reconfigure_pmd_threads(struct dp_netdev *dp)
         reload_affected_pmds(dp);
     }
 
-    /* Check for required new pmd threads */
+    /* Check for required new pmd threads. */
     FOR_EACH_CORE_ON_DUMP(core, pmd_cores) {
         pmd = dp_netdev_get_pmd(dp, core->core_id);
         if (!pmd) {
@@ -5336,7 +5333,7 @@ reconfigure_datapath(struct dp_netdev *dp)
         pmd->isolated = false;
     }
 
-    /* Reset all the queues to unassigned */
+    /* Reset all the queues to unassigned. */
     HMAP_FOR_EACH (port, node, &dp->ports) {
         for (int i = 0; i < port->n_rxq; i++) {
             port->rxqs[i].pmd = NULL;
@@ -5429,11 +5426,11 @@ reconfigure_datapath(struct dp_netdev *dp)
     /* Reload affected pmd threads. */
     reload_affected_pmds(dp);
 
-    /* Check if PMD Auto LB is to be enabled */
+    /* Check if PMD Auto LB is to be enabled. */
     set_pmd_auto_lb(dp);
 }
 
-/* Returns true if one of the netdevs in 'dp' requires a reconfiguration */
+/* Returns true if one of the netdevs in 'dp' requires a reconfiguration. */
 static bool
 ports_require_restart(const struct dp_netdev *dp)
     OVS_REQUIRES(dp->port_mutex)
@@ -5453,7 +5450,7 @@ ports_require_restart(const struct dp_netdev *dp)
  * of elements in array to be considered for calculating vairance.
  * Usage example: data array 'a' contains the processing load of each pmd and
  * 'n' is the number of PMDs. It returns the variance in processing load of
- * PMDs*/
+ * PMDs. */
 static uint64_t
 variance(uint64_t a[], int n)
 {
@@ -5934,7 +5931,7 @@ pmd_thread_main(void *f_)
 reload:
     atomic_count_init(&pmd->pmd_overloaded, 0);
 
-    /* List port/core affinity */
+    /* List port/core affinity. */
     for (i = 0; i < poll_cnt; i++) {
        VLOG_DBG("Core %d processing port \'%s\' with queue-id %d\n",
                 pmd->core_id, netdev_rxq_get_name(poll_list[i].rxq->rx),
@@ -6072,7 +6069,7 @@ dp_netdev_disable_upcall(struct dp_netdev *dp)
 }
 
 
-/* Meters */
+/* Meters. */
 static void
 dpif_netdev_meter_get_features(const struct dpif * dpif OVS_UNUSED,
                                struct ofputil_meter_features *features)
@@ -6093,9 +6090,9 @@ dp_netdev_run_meter(struct dp_netdev *dp, struct dp_packet_batch *packets_,
     struct dp_meter *meter;
     struct dp_meter_band *band;
     struct dp_packet *packet;
-    long long int long_delta_t; /* msec */
-    uint32_t delta_t; /* msec */
-    uint32_t delta_in_us; /* usec */
+    long long int long_delta_t; /* msec. */
+    uint32_t delta_t; /* msec. */
+    uint32_t delta_in_us; /* usec. */
     const size_t cnt = dp_packet_batch_size(packets_);
     uint32_t bytes, volume;
     int exceeded_band[NETDEV_MAX_BURST];
@@ -6118,7 +6115,7 @@ dp_netdev_run_meter(struct dp_netdev *dp, struct dp_packet_batch *packets_,
     memset(exceeded_rate, 0, cnt * sizeof *exceeded_rate);
 
     /* All packets will hit the meter at the same time. */
-    long_delta_t = now / 1000 - meter->used / 1000; /* msec */
+    long_delta_t = now / 1000 - meter->used / 1000; /* msec. */
 
     if (long_delta_t < 0) {
         /* This condition means that we have several threads fighting for a
@@ -6153,7 +6150,7 @@ dp_netdev_run_meter(struct dp_netdev *dp, struct dp_packet_batch *packets_,
         volume = cnt * 1000; /* Take 'cnt' packets from the bucket. */
     } else {
         /* Rate in kbps, bucket in bits. */
-        /* msec * kbps = bits */
+        /* msec * kbps = bits. */
         volume = bytes * 8;
     }
 
@@ -6203,7 +6200,7 @@ dp_netdev_run_meter(struct dp_netdev *dp, struct dp_packet_batch *packets_,
                         }
                         /* Update the exceeding band for the exceeding packet.
                          * (Only one band will be fired by a packet, and that
-                         * can be different for each packet.) */
+                         * can be different for each packet). */
                         if (band->up.rate > exceeded_rate[i]) {
                             exceeded_rate[i] = band->up.rate;
                             exceeded_band[i] = m;
@@ -6253,7 +6250,7 @@ dpif_netdev_meter_set(struct dpif *dpif, ofproto_meter_id meter_id,
     }
 
     if (config->flags & ~DP_SUPPORTED_METER_FLAGS_MASK) {
-        return EBADF; /* Unsupported flags set */
+        return EBADF; /* Unsupported flags set. */
     }
 
     if (config->n_bands > MAX_BANDS) {
@@ -6265,11 +6262,11 @@ dpif_netdev_meter_set(struct dpif *dpif, ofproto_meter_id meter_id,
         case OFPMBT13_DROP:
             break;
         default:
-            return ENODEV; /* Unsupported band type */
+            return ENODEV; /* Unsupported band type. */
         }
     }
 
-    /* Allocate meter */
+    /* Allocate meter. */
     meter = xzalloc(sizeof *meter
                     + config->n_bands * sizeof(struct dp_meter_band));
 
@@ -6278,7 +6275,7 @@ dpif_netdev_meter_set(struct dpif *dpif, ofproto_meter_id meter_id,
     meter->max_delta_t = 0;
     meter->used = time_usec();
 
-    /* set up bands */
+    /* Set up bands. */
     for (i = 0; i < config->n_bands; ++i) {
         uint32_t band_max_delta_t;
 
@@ -6303,7 +6300,7 @@ dpif_netdev_meter_set(struct dpif *dpif, ofproto_meter_id meter_id,
     }
 
     meter_lock(dp, mid);
-    dp_delete_meter(dp, mid); /* Free existing meter, if any */
+    dp_delete_meter(dp, mid); /* Free existing meter, if any. */
     dp->meters[mid] = meter;
     meter_unlock(dp, mid);
 
@@ -6497,7 +6494,7 @@ dp_netdev_configure_pmd(struct dp_netdev_pmd_thread *pmd, struct dp_netdev *dp,
     hmap_init(&pmd->tnl_port_cache);
     hmap_init(&pmd->send_port_cache);
     cmap_init(&pmd->tx_bonds);
-    /* init the 'flow_cache' since there is no
+    /* Init the 'flow_cache' since there is no
      * actual thread created for NON_PMD_CORE_ID. */
     if (core_id == NON_PMD_CORE_ID) {
         dfc_cache_init(&pmd->flow_cache);
@@ -6519,7 +6516,7 @@ dp_netdev_destroy_pmd(struct dp_netdev_pmd_thread *pmd)
     hmap_destroy(&pmd->tx_ports);
     cmap_destroy(&pmd->tx_bonds);
     hmap_destroy(&pmd->poll_list);
-    /* All flows (including their dpcls_rules) have been deleted already */
+    /* All flows (including their dpcls_rules) have been deleted already. */
     CMAP_FOR_EACH (cls, node, &pmd->classifiers) {
         dpcls_destroy(cls);
         ovsrcu_postpone(free, cls);
@@ -6539,7 +6536,7 @@ static void
 dp_netdev_del_pmd(struct dp_netdev *dp, struct dp_netdev_pmd_thread *pmd)
 {
     /* NON_PMD_CORE_ID doesn't have a thread, so we don't have to synchronize,
-     * but extra cleanup is necessary */
+     * but extra cleanup is necessary. */
     if (pmd->core_id == NON_PMD_CORE_ID) {
         ovs_mutex_lock(&dp->non_pmd_mutex);
         dfc_cache_uninit(&pmd->flow_cache);
@@ -6839,7 +6836,7 @@ dpif_netdev_packet_get_rss_hash(struct dp_packet *packet,
     }
 
     /* The RSS hash must account for the recirculation depth to avoid
-     * collisions in the exact match cache */
+     * collisions in the exact match cache. */
     recirc_depth = *recirc_depth_get_unsafe();
     if (OVS_UNLIKELY(recirc_depth)) {
         hash = hash_finish(hash, recirc_depth);
@@ -6945,7 +6942,7 @@ smc_lookup_batch(struct dp_netdev_pmd_thread *pmd,
     int recv_idx;
     uint16_t tcp_flags;
 
-    /* Prefetch buckets for all packets */
+    /* Prefetch buckets for all packets. */
     for (i = 0; i < cnt; i++) {
         OVS_PREFETCH(&smc_cache->buckets[keys[i].hash & SMC_MASK]);
     }
@@ -6965,7 +6962,7 @@ smc_lookup_batch(struct dp_netdev_pmd_thread *pmd,
                 flow->flow.in_port.odp_port == packet->md.in_port.odp_port)) {
                     tcp_flags = miniflow_get_tcp_flags(&keys[i].mf);
 
-                    /* SMC hit and emc miss, we insert into EMC */
+                    /* SMC hit and emc miss, we insert into EMC. */
                     keys[i].len =
                         netdev_flow_key_size(miniflow_n_values(&keys[i].mf));
                     emc_probabilistic_insert(pmd, &keys[i], flow);
@@ -6991,7 +6988,7 @@ smc_lookup_batch(struct dp_netdev_pmd_thread *pmd,
         /* Preserve the order of packet for flow batching. */
         index_map[n_missed] = recv_idx;
 
-        /* Put missed keys to the pointer arrays return to the caller */
+        /* Put missed keys to the pointer arrays return to the caller. */
         missed_keys[n_missed++] = &keys[i];
     }
 
@@ -7088,7 +7085,7 @@ dfc_processing(struct dp_netdev_pmd_thread *pmd,
                 ? dpif_netdev_packet_get_rss_hash_orig_pkt(packet, &key->mf)
                 : dpif_netdev_packet_get_rss_hash(packet, &key->mf);
 
-        /* If EMC is disabled skip emc_lookup */
+        /* If EMC is disabled skip emc_lookup. */
         flow = (cur_min != 0) ? emc_lookup(&cache->emc_cache, key) : NULL;
         if (OVS_LIKELY(flow)) {
             tcp_flags = miniflow_get_tcp_flags(&key->mf);
@@ -7134,7 +7131,7 @@ dfc_processing(struct dp_netdev_pmd_thread *pmd,
         return dp_packet_batch_size(packets_);
     }
 
-    /* Packets miss EMC will do a batch lookup in SMC if enabled */
+    /* Packets miss EMC will do a batch lookup in SMC if enabled. */
     smc_lookup_batch(pmd, keys, missed_keys, packets_,
                      n_missed, flow_map, index_map);
 
@@ -7247,7 +7244,7 @@ fast_path_processing(struct dp_netdev_pmd_thread *pmd,
         /* Key length is needed in all the cases, hash computed on demand. */
         keys[i]->len = netdev_flow_key_size(miniflow_n_values(&keys[i]->mf));
     }
-    /* Get the classifier for the in_port */
+    /* Get the classifier for the in_port. */
     cls = dp_netdev_pmd_lookup_dpcls(pmd, in_port);
     if (OVS_LIKELY(cls)) {
         any_miss = !dpcls_lookup(cls, (const struct netdev_flow_key **)keys,
@@ -7643,9 +7640,7 @@ dp_execute_lb_output_action(struct dp_netdev_pmd_thread *pmd,
     dp_packet_batch_apply_cutlen(packets_);
 
     DP_PACKET_BATCH_FOR_EACH (i, packet, packets_) {
-        /*
-         * Lookup the bond-hash table using hash to get the slave.
-         */
+         /* Lookup the bond-hash table using hash to get the slave. */
         uint32_t hash = dp_packet_get_rss_hash(packet);
         struct slave_entry *s_entry = &p_bond->slave_buckets[hash & BOND_MASK];
         odp_port_t bond_member = s_entry->slave_id;
@@ -7841,7 +7836,7 @@ dp_execute_cb(void *aux_, struct dp_packet_batch *packets_,
             switch(sub_type) {
             case OVS_CT_ATTR_FORCE_COMMIT:
                 force = true;
-                /* fall through. */
+                /* Fall through. */
             case OVS_CT_ATTR_COMMIT:
                 commit = true;
                 break;
@@ -8390,7 +8385,7 @@ dpif_netdev_bond_stats_get(struct dpif *dpif, uint32_t bond_id,
 
 const struct dpif_class dpif_netdev_class = {
     "netdev",
-    true,                       /* cleanup_required */
+    true,                       /* cleanup_required. */
     dpif_netdev_init,
     dpif_netdev_enumerate,
     dpif_netdev_port_open_type,
@@ -8400,13 +8395,13 @@ const struct dpif_class dpif_netdev_class = {
     dpif_netdev_run,
     dpif_netdev_wait,
     dpif_netdev_get_stats,
-    NULL,                      /* set_features */
+    NULL,                      /* set_features. */
     dpif_netdev_port_add,
     dpif_netdev_port_del,
     dpif_netdev_port_set_config,
     dpif_netdev_port_query_by_number,
     dpif_netdev_port_query_by_name,
-    NULL,                       /* port_get_pid */
+    NULL,                       /* port_get_pid. */
     dpif_netdev_port_dump_start,
     dpif_netdev_port_dump_next,
     dpif_netdev_port_dump_done,
@@ -8419,13 +8414,13 @@ const struct dpif_class dpif_netdev_class = {
     dpif_netdev_flow_dump_thread_destroy,
     dpif_netdev_flow_dump_next,
     dpif_netdev_operate,
-    NULL,                       /* recv_set */
-    NULL,                       /* handlers_set */
+    NULL,                       /* recv_set. */
+    NULL,                       /* handlers_set. */
     dpif_netdev_set_config,
     dpif_netdev_queue_to_priority,
-    NULL,                       /* recv */
-    NULL,                       /* recv_wait */
-    NULL,                       /* recv_purge */
+    NULL,                       /* recv. */
+    NULL,                       /* recv_wait. */
+    NULL,                       /* recv_purge. */
     dpif_netdev_register_dp_purge_cb,
     dpif_netdev_register_upcall_cb,
     dpif_netdev_enable_upcall,
@@ -8446,9 +8441,9 @@ const struct dpif_class dpif_netdev_class = {
     dpif_netdev_ct_set_timeout_policy,
     dpif_netdev_ct_get_timeout_policy,
     dpif_netdev_ct_del_timeout_policy,
-    NULL,                       /* ct_timeout_policy_dump_start */
-    NULL,                       /* ct_timeout_policy_dump_next */
-    NULL,                       /* ct_timeout_policy_dump_done */
+    NULL,                       /* ct_timeout_policy_dump_start. */
+    NULL,                       /* ct_timeout_policy_dump_next. */
+    NULL,                       /* ct_timeout_policy_dump_done. */
     dpif_netdev_ct_get_timeout_policy_name,
     dpif_netdev_ipf_set_enabled,
     dpif_netdev_ipf_set_min_frag,
@@ -8533,8 +8528,7 @@ dpif_dummy_override(const char *type)
 {
     int error;
 
-    /*
-     * Ignore EAFNOSUPPORT to allow --enable-dummy=system with
+    /* Ignore EAFNOSUPPORT to allow --enable-dummy=system with
      * a userland-only build.  It's useful for testsuite.
      */
     error = dp_unregister_provider(type);
@@ -8643,7 +8637,7 @@ dpcls_create_subtable(struct dpcls *cls, const struct netdev_flow_key *mask)
     subtable->lookup_func = dpcls_subtable_get_best_impl(unit0, unit1);
 
     cmap_insert(&cls->subtables_map, &subtable->cmap_node, mask->hash);
-    /* Add the new subtable at the end of the pvector (with no hits yet) */
+    /* Add the new subtable at the end of the pvector (with no hits yet). */
     pvector_insert(&cls->subtables, subtable, 0);
     VLOG_DBG("Creating %"PRIuSIZE". subtable %p for in_port %d",
              cmap_count(&cls->subtables_map), subtable, cls->in_port);
@@ -8689,7 +8683,7 @@ dpcls_subtable_lookup_reprobe(struct dpcls *cls)
     return subtables_changed;
 }
 
-/* Periodically sort the dpcls subtable vectors according to hit counts */
+/* Periodically sort the dpcls subtable vectors according to hit counts. */
 static void
 dpcls_sort_subtable_vector(struct dpcls *cls)
 {
@@ -8756,7 +8750,7 @@ dp_netdev_pmd_try_optimize(struct dp_netdev_pmd_thread *pmd,
                                  curr_tsc - pmd->intrvl_tsc_prev);
         }
         pmd->intrvl_tsc_prev = curr_tsc;
-        /* Start new measuring interval */
+        /* Start new measuring interval. */
         pmd->rxq_next_cycle_store = pmd->ctx.now + PMD_RXQ_INTERVAL_LEN;
     }
 
@@ -8764,12 +8758,12 @@ dp_netdev_pmd_try_optimize(struct dp_netdev_pmd_thread *pmd,
         /* Try to obtain the flow lock to block out revalidator threads.
          * If not possible, just try next time. */
         if (!ovs_mutex_trylock(&pmd->flow_mutex)) {
-            /* Optimize each classifier */
+            /* Optimize each classifier. */
             CMAP_FOR_EACH (cls, node, &pmd->classifiers) {
                 dpcls_sort_subtable_vector(cls);
             }
             ovs_mutex_unlock(&pmd->flow_mutex);
-            /* Start new measuring interval */
+            /* Start new measuring interval. */
             pmd->next_optimization = pmd->ctx.now
                                      + DPCLS_OPTIMIZATION_INTERVAL;
         }
